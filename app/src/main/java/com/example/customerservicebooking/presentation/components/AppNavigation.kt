@@ -1,25 +1,23 @@
 package com.example.customerservicebooking.presentation.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.customerservicebooking.presentation.screens.detailScreen.ServiceDetailScreen
-import com.example.customerservicebooking.presentation.screens.detailScreen.ServiceDetailViewModel
-import com.example.customerservicebooking.presentation.screens.serviceScreen.ServiceListScreen
-import com.example.customerservicebooking.presentation.screens.serviceScreen.ServiceViewModel
+import com.example.customerservicebooking.presentation.screens.booking.BookingScreen
+import com.example.customerservicebooking.presentation.screens.booking.BookingViewModel
+import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailScreen
+import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
+import com.example.customerservicebooking.presentation.screens.services.ServiceListScreen
+import com.example.customerservicebooking.presentation.screens.services.ServiceViewModel
 
 @Composable
 fun AppNavigation(
     serviceViewModel: ServiceViewModel,
-    serviceDetailViewModel: ServiceDetailViewModel
+    serviceDetailViewModel: ServiceDetailViewModel,
+    bookingViewModel: BookingViewModel
 ) {
     val navController = rememberNavController()
 
@@ -42,25 +40,41 @@ fun AppNavigation(
                 viewModel = serviceDetailViewModel,
                 onBackClick = { navController.popBackStack() },
                 onBookNowClick = { service, date, slot ->
-                    navController.navigate("bookingConfirm/${service.id}/$date/${slot.startTime}")
+                    navController.navigate("booking/${service.id}/${service.name}/${date}/${slot.startTime}/${service.currency} ${service.price}")
                 }
             )
         }
         composable(
-            route = "bookingConfirm/{serviceId}/{date}/{startTime}",
+            route = "booking/{serviceId}/{serviceName}/{date}/{startTime}/{price}",
             arguments = listOf(
                 navArgument("serviceId") { type = NavType.StringType },
+                navArgument("serviceName") { type = NavType.StringType },
                 navArgument("date") { type = NavType.StringType },
-                navArgument("startTime") { type = NavType.StringType }
+                navArgument("startTime") { type = NavType.StringType },
+                navArgument("price") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val serviceId = backStackEntry.arguments?.getString("serviceId")
-            val date = backStackEntry.arguments?.getString("date")
-            val startTime = backStackEntry.arguments?.getString("startTime")
-            
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Booking Screen for $serviceId on $date at $startTime")
-            }
+            val serviceId = backStackEntry.arguments?.getString("serviceId") ?: ""
+            val serviceName = backStackEntry.arguments?.getString("serviceName") ?: ""
+            val date = backStackEntry.arguments?.getString("date") ?: ""
+            val startTime = backStackEntry.arguments?.getString("startTime") ?: ""
+            val price = backStackEntry.arguments?.getString("price") ?: ""
+
+            BookingScreen(
+                serviceId = serviceId,
+                serviceName = serviceName,
+                date = date,
+                startTime = startTime,
+                price = price,
+                viewModel = bookingViewModel,
+                onBackClick = { navController.popBackStack() },
+                onBookingSuccess = {
+                    bookingViewModel.resetState()
+                    navController.navigate("serviceList") {
+                        popUpTo("serviceList") { inclusive = true }
+                    }
+                }
+            )
         }
     }
 }

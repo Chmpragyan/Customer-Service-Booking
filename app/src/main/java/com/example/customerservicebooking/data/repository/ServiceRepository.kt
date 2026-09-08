@@ -1,6 +1,7 @@
 package com.example.customerservicebooking.data.repository
 
 import com.example.customerservicebooking.data.mock.MockApiService
+import com.example.customerservicebooking.model.BookingRequest
 
 class ServiceRepository(private val apiService: MockApiService) {
     suspend fun getServices(query: String? = null) = apiService.getServices(query)
@@ -9,5 +10,8 @@ class ServiceRepository(private val apiService: MockApiService) {
 
     suspend fun getAvailability(serviceId: String, date: String) =
         apiService.getAvailability(serviceId, date)
+
+    suspend fun createBooking(request: BookingRequest) =
+        apiService.createBooking(request)
 
 }

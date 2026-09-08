@@ -1,4 +1,4 @@
-package com.example.customerservicebooking.presentation.screens.detailScreen
+package com.example.customerservicebooking.presentation.screens.serviceDetail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
