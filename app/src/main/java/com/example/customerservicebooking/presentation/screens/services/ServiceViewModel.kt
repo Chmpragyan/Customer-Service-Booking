@@ -15,13 +15,34 @@ class ServiceViewModel(private val repository: ServiceRepository) : ViewModel() 
     private val _servicesState = MutableStateFlow<ServiceUiState>(ServiceUiState.Loading)
     val servicesState: StateFlow<ServiceUiState> = _servicesState.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     init {
         loadServices()
     }
 
-    fun loadServices(query: String? = null) {
+    fun onRefresh() {
         viewModelScope.launch {
-            _servicesState.value = ServiceUiState.Loading
+            _isRefreshing.value = true
+            loadServices(_searchQuery.value, isRefreshing = true)
+            _isRefreshing.value = false
+        }
+    }
+
+    fun onSearchQueryChange(newQuery: String) {
+        _searchQuery.value = newQuery
+        loadServices(newQuery)
+    }
+
+    fun loadServices(query: String? = _searchQuery.value, isRefreshing: Boolean = false) {
+        viewModelScope.launch {
+            if (!isRefreshing) {
+                _servicesState.value = ServiceUiState.Loading
+            }
             when (val result = repository.getServices(query)) {
                 is ApiResponseEvent.Success -> {
                     _servicesState.value = ServiceUiState.Success(result.data)

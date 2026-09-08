@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -60,7 +62,9 @@ fun ServiceListScreen(
     onMyBookingsClick: () -> Unit
 ) {
     val uiState by viewModel.servicesState.collectAsState()
-    var searchQuery by remember { mutableStateOf("") }
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    var isSearchFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Scaffold(
@@ -87,19 +91,18 @@ fun ServiceListScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = {
-                    searchQuery = it
-                    viewModel.loadServices(it)
+                    viewModel.onSearchQueryChange(it)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .onFocusChanged { },
                 placeholder = { Text(stringResource(R.string.search_services_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = {
-                            searchQuery = ""
-                            viewModel.loadServices("")
+                            viewModel.onSearchQueryChange("")
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
@@ -115,49 +118,61 @@ fun ServiceListScreen(
                 })
             )
 
-            when (val state = uiState) {
-                is ServiceUiState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
-
-                is ServiceUiState.Success -> {
-                    if (state.services.isEmpty()) {
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.onRefresh() },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                when (val state = uiState) {
+                    is ServiceUiState.Loading -> {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(stringResource(R.string.no_services_found))
+                            CircularProgressIndicator()
                         }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(state.services) { service ->
-                                ServiceItem(
-                                    service = service,
-                                    onClick = {
-                                        focusManager.clearFocus()
-                                        onServiceClick(service)
-                                    }
-                                )
+                    }
+
+                    is ServiceUiState.Success -> {
+                        if (state.services.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(stringResource(R.string.no_services_found))
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(state.services) { service ->
+                                    ServiceItem(
+                                        service = service,
+                                        onClick = {
+                                            focusManager.clearFocus()
+                                            onServiceClick(service)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                is ServiceUiState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.error_message, state.message),
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            Button(onClick = { viewModel.loadServices(searchQuery) }) {
-                                Text(stringResource(R.string.retry))
+                    is ServiceUiState.Error -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = stringResource(R.string.error_message, state.message),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                                Button(onClick = { viewModel.loadServices(searchQuery) }) {
+                                    Text(stringResource(R.string.retry))
+                                }
                             }
                         }
                     }
