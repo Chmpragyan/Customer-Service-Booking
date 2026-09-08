@@ -8,6 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.customerservicebooking.presentation.screens.booking.BookingScreen
 import com.example.customerservicebooking.presentation.screens.booking.BookingViewModel
+import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingScreen
+import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingViewModel
 import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailScreen
 import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
 import com.example.customerservicebooking.presentation.screens.services.ServiceListScreen
@@ -17,7 +19,8 @@ import com.example.customerservicebooking.presentation.screens.services.ServiceV
 fun AppNavigation(
     serviceViewModel: ServiceViewModel,
     serviceDetailViewModel: ServiceDetailViewModel,
-    bookingViewModel: BookingViewModel
+    bookingViewModel: BookingViewModel,
+    myBookingViewModel: MyBookingViewModel
 ) {
     val navController = rememberNavController()
 
@@ -27,6 +30,9 @@ fun AppNavigation(
                 viewModel = serviceViewModel,
                 onServiceClick = { service ->
                     navController.navigate("serviceDetail/${service.id}")
+                },
+                onMyBookingsClick = {
+                    navController.navigate("myBookings")
                 }
             )
         }
@@ -70,9 +76,18 @@ fun AppNavigation(
                 onBackClick = { navController.popBackStack() },
                 onBookingSuccess = {
                     bookingViewModel.resetState()
-                    navController.navigate("serviceList") {
-                        popUpTo("serviceList") { inclusive = true }
+                    navController.navigate("myBookings") {
+                        popUpTo("serviceList") { inclusive = false }
                     }
+                }
+            )
+        }
+        composable("myBookings") {
+            MyBookingScreen(
+                viewModel = myBookingViewModel,
+                onBackClick = { navController.popBackStack() },
+                onBookingClick = { booking ->
+                    // Navigate to details if needed
                 }
             )
         }
