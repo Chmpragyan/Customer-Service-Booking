@@ -60,6 +60,39 @@ class MockApiService : ApiInterface {
             90,
             4.6,
             "Lawn mowing and garden maintenance"
+        ),
+        Service(
+            "5",
+            "Electrical Repair",
+            "Maintenance",
+            "PowerFix Electricians",
+            700.0,
+            "NPR",
+            60,
+            4.7,
+            "Professional electrical repair and installation"
+        ),
+        Service(
+            "Pest Control",
+            "Cleaning",
+            "6",
+            "SafeHome Pest Control",
+            1000.0,
+            "NPR",
+            90,
+            4.4,
+            "Effective pest control for homes and offices"
+        ),
+        Service(
+            "7",
+            "Car Wash",
+            "Automotive",
+            "Shine Auto Care",
+            500.0,
+            "NPR",
+            60,
+            4.5,
+            "Professional exterior and interior car cleaning"
         )
     )
 
@@ -68,7 +101,12 @@ class MockApiService : ApiInterface {
     override suspend fun getServices(query: String?): ApiResponseEvent<List<Service>> {
         delay(500)
         val filtered = if (query != null) {
-            services.filter { it.name.contains(query, ignoreCase = true) || it.category.contains(query, ignoreCase = true) }
+            services.filter {
+                it.name.contains(query, ignoreCase = true) || it.category.contains(
+                    query,
+                    ignoreCase = true
+                )
+            }
         } else {
             services
         }
@@ -85,7 +123,10 @@ class MockApiService : ApiInterface {
         }
     }
 
-    override suspend fun getAvailability(serviceId: String, date: String): ApiResponseEvent<List<TimeSlot>> {
+    override suspend fun getAvailability(
+        serviceId: String,
+        date: String
+    ): ApiResponseEvent<List<TimeSlot>> {
         delay(500)
         val slots = listOf(
             TimeSlot("s1", date, "09:00", "10:00", true),
