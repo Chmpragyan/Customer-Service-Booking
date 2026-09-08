@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -40,8 +43,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.customerservicebooking.R
@@ -56,6 +61,7 @@ fun ServiceListScreen(
 ) {
     val uiState by viewModel.servicesState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
         topBar = {
@@ -89,7 +95,24 @@ fun ServiceListScreen(
                     .padding(16.dp),
                 placeholder = { Text(stringResource(R.string.search_services_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                singleLine = true
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = {
+                            searchQuery = ""
+                            viewModel.loadServices("")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.clear_search)
+                            )
+                        }
+                    }
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = {
+                    focusManager.clearFocus()
+                })
             )
 
             when (val state = uiState) {
@@ -98,9 +121,13 @@ fun ServiceListScreen(
                         CircularProgressIndicator()
                     }
                 }
+
                 is ServiceUiState.Success -> {
                     if (state.services.isEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Text(stringResource(R.string.no_services_found))
                         }
                     } else {
@@ -110,11 +137,18 @@ fun ServiceListScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(state.services) { service ->
-                                ServiceItem(service = service, onClick = { onServiceClick(service) })
+                                ServiceItem(
+                                    service = service,
+                                    onClick = {
+                                        focusManager.clearFocus()
+                                        onServiceClick(service)
+                                    }
+                                )
                             }
                         }
                     }
                 }
+
                 is ServiceUiState.Error -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -162,25 +196,25 @@ fun ServiceItem(service: Service, onClick: () -> Unit) {
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             Text(
                 text = service.category,
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = service.description,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 2
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Star,
@@ -208,7 +242,7 @@ fun ServiceItem(service: Service, onClick: () -> Unit) {
 @Preview(showBackground = true)
 fun ServiceItemPreview() {
     val mockService = Service(
-        "1", "AC Repair", "Maintenance", "CoolAir Solutions", 
+        "1", "AC Repair", "Maintenance", "CoolAir Solutions",
         500.0, "NPR", 60, 4.5, "Professional AC maintenance and repair"
     )
     ServiceItem(service = mockService, onClick = {})
