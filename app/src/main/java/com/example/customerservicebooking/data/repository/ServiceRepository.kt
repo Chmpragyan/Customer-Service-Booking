@@ -14,4 +14,6 @@ class ServiceRepository(private val apiService: MockApiService) {
     suspend fun createBooking(request: BookingRequest) =
         apiService.createBooking(request)
 
+    suspend fun getBookings() = apiService.getBookings()
+
 }
