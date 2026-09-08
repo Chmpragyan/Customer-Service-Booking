@@ -49,16 +49,17 @@ fun AppNavigation(
                 viewModel = serviceDetailViewModel,
                 onBackClick = { navController.popBackStack() },
                 onBookNowClick = { service, date, slot ->
-                    navController.navigate("booking/${service.id}/${service.name}/${date}/${slot.startTime}/${service.currency} ${service.price}")
+                    navController.navigate("booking/${service.id}/${service.name}/${date}/${slot.id}/${slot.startTime}/${service.currency} ${service.price}")
                 }
             )
         }
         composable(
-            route = "booking/{serviceId}/{serviceName}/{date}/{startTime}/{price}",
+            route = "booking/{serviceId}/{serviceName}/{date}/{slotId}/{startTime}/{price}",
             arguments = listOf(
                 navArgument("serviceId") { type = NavType.StringType },
                 navArgument("serviceName") { type = NavType.StringType },
                 navArgument("date") { type = NavType.StringType },
+                navArgument("slotId") { type = NavType.StringType },
                 navArgument("startTime") { type = NavType.StringType },
                 navArgument("price") { type = NavType.StringType }
             )
@@ -66,6 +67,7 @@ fun AppNavigation(
             val serviceId = backStackEntry.arguments?.getString("serviceId") ?: ""
             val serviceName = backStackEntry.arguments?.getString("serviceName") ?: ""
             val date = backStackEntry.arguments?.getString("date") ?: ""
+            val slotId = backStackEntry.arguments?.getString("slotId") ?: ""
             val startTime = backStackEntry.arguments?.getString("startTime") ?: ""
             val price = backStackEntry.arguments?.getString("price") ?: ""
 
@@ -73,6 +75,7 @@ fun AppNavigation(
                 serviceId = serviceId,
                 serviceName = serviceName,
                 date = date,
+                slotId = slotId,
                 startTime = startTime,
                 price = price,
                 viewModel = bookingViewModel,

@@ -19,6 +19,7 @@ class BookingViewModel(private val repository: ServiceRepository) : ViewModel() 
     fun confirmBooking(
         serviceId: String,
         date: String,
+        slotId: String,
         startTime: String,
         customerName: String,
         customerContact: String,
@@ -33,7 +34,7 @@ class BookingViewModel(private val repository: ServiceRepository) : ViewModel() 
             _uiState.value = BookingUiState.Submitting
             val request = BookingRequest(
                 serviceId = serviceId,
-                slotId = "dummy_slot_id",
+                slotId = slotId,
                 date = date,
                 startTime = startTime,
                 customerName = customerName,
@@ -45,6 +46,7 @@ class BookingViewModel(private val repository: ServiceRepository) : ViewModel() 
                 is ApiResponseEvent.Success -> {
                     _uiState.value = BookingUiState.Success(result.data)
                 }
+
                 is ApiResponseEvent.Error -> {
                     _uiState.value = BookingUiState.Error(result.error.message)
                 }

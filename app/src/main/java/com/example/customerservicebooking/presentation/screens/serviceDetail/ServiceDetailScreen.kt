@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Service
 import com.example.customerservicebooking.model.TimeSlot
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,7 +90,10 @@ fun ServiceDetailScreen(
                     availabilityState = availabilityState,
                     selectedDate = selectedDate,
                     selectedSlot = selectedSlot,
-                    onDateSelected = { viewModel.selectDate(service.id, it) },
+                    onDateSelected = {
+                        selectedSlot = null // Reset slot when date changes
+                        viewModel.selectDate(service.id, it)
+                    },
                     onSlotSelected = { selectedSlot = it },
                     modifier = Modifier.padding(paddingValues)
                 )
@@ -180,8 +185,8 @@ fun ServiceDetailContent(
             fontWeight = FontWeight.Bold
         )
         
-        // Mocking available dates if none exist in the model for testing
-        val dates = service.availableDates.ifEmpty { listOf("2024-05-20", "2024-05-21", "2024-05-22") }
+        // Use available dates from service model
+        val dates = service.availableDates
         
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -253,18 +258,32 @@ fun InfoChip(label: String, value: String) {
 
 @Composable
 fun DateItem(date: String, isSelected: Boolean, onClick: () -> Unit) {
+    // "yyyy-MM-dd"
+    val displayDate = try {
+        val dateObj = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(date)
+        SimpleDateFormat("MMM dd\nEEE", Locale.getDefault()).format(dateObj!!)
+    } catch (e: Exception) {
+        date
+    }
+
     Card(
-        modifier = Modifier.clickable(onClick = onClick),
+        modifier = Modifier
+            .width(80.dp)
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
-        border = if (!isSelected) BorderStroke(1.dp, Color.LightGray) else null
+        border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)) else null
     ) {
         Text(
-            text = date,
-            modifier = Modifier.padding(12.dp),
-            color = if (isSelected) Color.White else Color.Black,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+            text = displayDate,
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.example.customerservicebooking.data.mock
 
+import android.util.Log
 import com.example.customerservicebooking.data.network.interfaces.ApiInterface
 import com.example.customerservicebooking.model.Booking
 import com.example.customerservicebooking.model.BookingRequest
@@ -16,6 +17,12 @@ import java.util.UUID
 
 class MockApiService : ApiInterface {
 
+    private val sdfDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val today = sdfDate.format(Date())
+    private val tomorrow = sdfDate.format(Date(System.currentTimeMillis() + 86400000))
+    private val dayAfter = sdfDate.format(Date(System.currentTimeMillis() + 172800000))
+    private val mockDates = listOf(today, tomorrow, dayAfter)
+
     private val services = listOf(
         Service(
             "1",
@@ -26,7 +33,8 @@ class MockApiService : ApiInterface {
             "NPR",
             60,
             4.5,
-            "Professional AC maintenance and repair"
+            "Professional AC maintenance and repair",
+            mockDates
         ),
         Service(
             "2",
@@ -37,7 +45,8 @@ class MockApiService : ApiInterface {
             "NPR",
             120,
             4.8,
-            "Deep cleaning for your home"
+            "Deep cleaning for your home",
+            mockDates
         ),
         Service(
             "3",
@@ -48,7 +57,8 @@ class MockApiService : ApiInterface {
             "NPR",
             45,
             4.2,
-            "Emergency plumbing services"
+            "Emergency plumbing services",
+            mockDates
         ),
         Service(
             "4",
@@ -59,7 +69,8 @@ class MockApiService : ApiInterface {
             "NPR",
             90,
             4.6,
-            "Lawn mowing and garden maintenance"
+            "Lawn mowing and garden maintenance",
+            mockDates
         ),
         Service(
             "5",
@@ -70,18 +81,20 @@ class MockApiService : ApiInterface {
             "NPR",
             60,
             4.7,
-            "Professional electrical repair and installation"
+            "Professional electrical repair and installation",
+            mockDates
         ),
         Service(
+            "6",
             "Pest Control",
             "Cleaning",
-            "6",
             "SafeHome Pest Control",
             1000.0,
             "NPR",
             90,
             4.4,
-            "Effective pest control for homes and offices"
+            "Effective pest control for homes and offices",
+            mockDates
         ),
         Service(
             "7",
@@ -92,11 +105,14 @@ class MockApiService : ApiInterface {
             "NPR",
             60,
             4.5,
-            "Professional exterior and interior car cleaning"
+            "Professional exterior and interior car cleaning",
+            mockDates
         )
     )
 
     private val bookings = mutableListOf<Booking>()
+
+    private val bookedSlots = mutableSetOf<String>()
 
     override suspend fun getServices(query: String?): ApiResponseEvent<List<Service>> {
         delay(500)
@@ -128,17 +144,29 @@ class MockApiService : ApiInterface {
         date: String
     ): ApiResponseEvent<List<TimeSlot>> {
         delay(500)
+
+        fun isAvailable(slotId: String) = !bookedSlots.contains("$serviceId|$date|$slotId")
+
+        val isS3Available = date.hashCode() % 2 == 0
+
         val slots = listOf(
-            TimeSlot("s1", date, "09:00", "10:00", true),
-            TimeSlot("s2", date, "10:30", "11:30", true),
-            TimeSlot("s3", date, "13:00", "14:00", false),
-            TimeSlot("s4", date, "15:30", "16:30", true)
+            TimeSlot("s1", date, "09:00", "10:00", isAvailable("s1")),
+            TimeSlot("s2", date, "10:30", "11:30", isAvailable("s2")),
+            TimeSlot("s3", date, "13:00", "14:00", isAvailable("s3") && isS3Available),
+            TimeSlot("s4", date, "15:30", "16:30", isAvailable("s4"))
         )
         return ApiResponseEvent.Success(slots)
     }
 
     override suspend fun createBooking(request: BookingRequest): ApiResponseEvent<Booking> {
         delay(1000)
+
+        val slotKey = "${request.serviceId}|${request.date}|${request.slotId}"
+
+        if (bookedSlots.contains(slotKey)) {
+            return ApiResponseEvent.Error(ApiError.Conflict("This time slot has just been booked by someone else. Please select another slot."))
+        }
+
         val service = services.find { it.id == request.serviceId }
             ?: return ApiResponseEvent.Error(ApiError.Conflict("Invalid service"))
 
@@ -159,6 +187,8 @@ class MockApiService : ApiInterface {
             currency = service.currency,
             createdAt = sdf.format(Date())
         )
+
+        bookedSlots.add(slotKey)
         bookings.add(newBooking)
         return ApiResponseEvent.Success(newBooking)
     }

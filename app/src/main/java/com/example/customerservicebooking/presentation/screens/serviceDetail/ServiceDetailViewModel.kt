@@ -29,9 +29,10 @@ class ServiceDetailViewModel(private val repository: ServiceRepository) : ViewMo
                 is ApiResponseEvent.Success -> {
                     val service = result.data
                     _uiState.value = ServiceDetailUiState.Success(service)
-                    // If service has available dates, select the first one by default
-                    if (service.availableDates.isNotEmpty()) {
-                        selectDate(serviceId, service.availableDates.first())
+                    
+                    // Automatically select the first available date and load its slots
+                    service.availableDates.firstOrNull()?.let { firstDate ->
+                        selectDate(service.id, firstDate)
                     }
                 }
                 is ApiResponseEvent.Error -> {

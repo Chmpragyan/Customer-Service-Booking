@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.customerservicebooking.R
@@ -53,6 +54,7 @@ fun BookingScreen(
     serviceId: String,
     serviceName: String,
     date: String,
+    slotId: String,
     startTime: String,
     price: String,
     viewModel: BookingViewModel,
@@ -60,11 +62,11 @@ fun BookingScreen(
     onBookingSuccess: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     var customerName by remember { mutableStateOf("") }
     var customerContact by remember { mutableStateOf("") }
     var customerAddress by remember { mutableStateOf("") }
-    
+
     var nameError by remember { mutableStateOf(false) }
     var contactError by remember { mutableStateOf(false) }
 
@@ -94,6 +96,7 @@ fun BookingScreen(
                 is BookingUiState.Success -> {
                     BookingSuccessContent(state.booking, onBookingSuccess)
                 }
+
                 else -> {
                     Column(
                         modifier = Modifier
@@ -129,28 +132,37 @@ fun BookingScreen(
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleLarge
                         )
-                        
+
                         OutlinedTextField(
                             value = customerName,
-                            onValueChange = { 
+                            onValueChange = {
                                 customerName = it
                                 nameError = false
                             },
+                            maxLines = 1,
                             label = { Text(stringResource(R.string.label_full_name)) },
                             modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Next
+                            ),
                             isError = nameError,
                             supportingText = { if (nameError) Text(stringResource(R.string.error_required)) }
                         )
 
                         OutlinedTextField(
                             value = customerContact,
-                            onValueChange = { 
+                            onValueChange = {
                                 customerContact = it
                                 contactError = false
                             },
+                            maxLines = 1,
                             label = { Text(stringResource(R.string.label_contact_number)) },
                             modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Phone,
+                                imeAction = ImeAction.Next
+                            ),
                             isError = contactError,
                             supportingText = { if (contactError) Text(stringResource(R.string.error_required)) }
                         )
@@ -160,6 +172,10 @@ fun BookingScreen(
                             onValueChange = { customerAddress = it },
                             label = { Text(stringResource(R.string.label_address_optional)) },
                             modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Done
+                            ),
                             minLines = 3
                         )
 
@@ -177,11 +193,12 @@ fun BookingScreen(
                             onClick = {
                                 nameError = customerName.isBlank()
                                 contactError = customerContact.isBlank()
-                                
+
                                 if (!nameError && !contactError) {
                                     viewModel.confirmBooking(
                                         serviceId = serviceId,
                                         date = date,
+                                        slotId = slotId,
                                         startTime = startTime,
                                         customerName = customerName,
                                         customerContact = customerContact,
@@ -193,7 +210,10 @@ fun BookingScreen(
                             enabled = state !is BookingUiState.Submitting
                         ) {
                             if (state is BookingUiState.Submitting) {
-                                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = Color.White
+                                )
                             } else {
                                 Text(stringResource(R.string.confirm_booking))
                             }
