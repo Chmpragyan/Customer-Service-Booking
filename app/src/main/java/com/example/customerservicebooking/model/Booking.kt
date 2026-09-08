@@ -1,5 +1,7 @@
 package com.example.customerservicebooking.model
 
+import com.example.customerservicebooking.utils.enums.BookingStatus
+
 data class Booking(
     val bookingId: String,
     val bookingNumber: String,
