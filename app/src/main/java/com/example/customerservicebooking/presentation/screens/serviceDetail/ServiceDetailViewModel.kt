@@ -1,4 +1,4 @@
-package com.example.customerservicebooking.presentation.screens.detailScreen
+package com.example.customerservicebooking.presentation.screens.serviceDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

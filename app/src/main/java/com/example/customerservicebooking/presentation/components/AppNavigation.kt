@@ -11,10 +11,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.customerservicebooking.presentation.screens.detailScreen.ServiceDetailScreen
-import com.example.customerservicebooking.presentation.screens.detailScreen.ServiceDetailViewModel
-import com.example.customerservicebooking.presentation.screens.serviceScreen.ServiceListScreen
-import com.example.customerservicebooking.presentation.screens.serviceScreen.ServiceViewModel
+import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailScreen
+import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
+import com.example.customerservicebooking.presentation.screens.services.ServiceListScreen
+import com.example.customerservicebooking.presentation.screens.services.ServiceViewModel
 
 @Composable
 fun AppNavigation(

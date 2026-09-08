@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import com.example.customerservicebooking.data.mock.MockApiService
 import com.example.customerservicebooking.data.repository.ServiceRepository
 import com.example.customerservicebooking.presentation.components.AppNavigation
-import com.example.customerservicebooking.presentation.screens.detailScreen.ServiceDetailViewModel
-import com.example.customerservicebooking.presentation.screens.serviceScreen.ServiceViewModel
+import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
+import com.example.customerservicebooking.presentation.screens.services.ServiceViewModel
 import com.example.customerservicebooking.ui.theme.CustomerServiceBookingTheme
 
 class MainActivity : ComponentActivity() {
