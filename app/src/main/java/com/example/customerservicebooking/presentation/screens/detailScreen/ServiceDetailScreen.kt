@@ -1,21 +1,42 @@
 package com.example.customerservicebooking.presentation.screens.detailScreen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.example.customerservicebooking.model.Service
+import com.example.customerservicebooking.model.TimeSlot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServiceDetailScreen(
     serviceId: String?,
-    onBackClick: () -> Unit
+    viewModel: ServiceDetailViewModel,
+    onBackClick: () -> Unit,
+    onBookNowClick: (Service, String, TimeSlot) -> Unit
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val availabilityState by viewModel.availabilityState.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    var selectedSlot by remember { mutableStateOf<TimeSlot?>(null) }
+
+    LaunchedEffect(serviceId) {
+        serviceId?.let { viewModel.loadService(it) }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -26,18 +47,257 @@ fun ServiceDetailScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            if (uiState is ServiceDetailUiState.Success) {
+                val service = (uiState as ServiceDetailUiState.Success).service
+                BottomAppBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            if (selectedDate != null && selectedSlot != null) {
+                                onBookNowClick(service, selectedDate!!, selectedSlot!!)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = selectedDate != null && selectedSlot != null
+                    ) {
+                        Text("Continue to Booking")
+                    }
+                }
+            }
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Service Detail for ID: $serviceId",
-                style = MaterialTheme.typography.headlineMedium
-            )
+        when (val state = uiState) {
+            is ServiceDetailUiState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            is ServiceDetailUiState.Success -> {
+                val service = state.service
+                ServiceDetailContent(
+                    service = service,
+                    availabilityState = availabilityState,
+                    selectedDate = selectedDate,
+                    selectedSlot = selectedSlot,
+                    onDateSelected = { viewModel.selectDate(service.id, it) },
+                    onSlotSelected = { selectedSlot = it },
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
+            is ServiceDetailUiState.Error -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                }
+            }
         }
     }
+}
+
+@Composable
+fun ServiceDetailContent(
+    service: Service,
+    availabilityState: AvailabilityUiState,
+    selectedDate: String?,
+    selectedSlot: TimeSlot?,
+    onDateSelected: (String) -> Unit,
+    onSlotSelected: (TimeSlot) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        // Service Header
+        Text(
+            text = service.name,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = service.category,
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Info Chips
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            InfoChip(label = "Provider", value = service.provider)
+            InfoChip(label = "Rating", value = "${service.rating} ⭐")
+            InfoChip(label = "Duration", value = "${service.durationMinutes} min")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Price Section
+        Text(
+            text = "${service.currency} ${service.price}",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Description
+        Text(
+            text = "Description",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = service.description,
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Date Selection
+        Text(
+            text = "Select Date",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+        
+        // Mocking available dates if none exist in the model for testing
+        val dates = service.availableDates.ifEmpty { listOf("2024-05-20", "2024-05-21", "2024-05-22") }
+        
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(vertical = 8.dp)
+        ) {
+            items(dates) { date ->
+                DateItem(
+                    date = date,
+                    isSelected = date == selectedDate,
+                    onClick = { onDateSelected(date) }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Availability Section
+        Text(
+            text = "Available Slots",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold
+        )
+
+        when (availabilityState) {
+            is AvailabilityUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            }
+            is AvailabilityUiState.Success -> {
+                if (availabilityState.slots.isEmpty()) {
+                    Text("No slots available for this date.")
+                } else {
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        availabilityState.slots.forEach { slot ->
+                            SlotItem(
+                                slot = slot,
+                                isSelected = slot == selectedSlot,
+                                onClick = { if (slot.isAvailable) onSlotSelected(slot) }
+                            )
+                        }
+                    }
+                }
+            }
+            is AvailabilityUiState.Error -> {
+                Text(text = availabilityState.message, color = MaterialTheme.colorScheme.error)
+            }
+            else -> {}
+        }
+        
+        Spacer(modifier = Modifier.height(80.dp)) // Extra space for bottom bar
+    }
+}
+
+@Composable
+fun InfoChip(label: String, value: String) {
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(text = label, style = MaterialTheme.typography.labelSmall)
+            Text(text = value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun DateItem(date: String, isSelected: Boolean, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+        ),
+        border = if (!isSelected) BorderStroke(1.dp, Color.LightGray) else null
+    ) {
+        Text(
+            text = date,
+            modifier = Modifier.padding(12.dp),
+            color = if (isSelected) Color.White else Color.Black,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+fun SlotItem(slot: TimeSlot, isSelected: Boolean, onClick: () -> Unit) {
+    val backgroundColor = when {
+        !slot.isAvailable -> Color.LightGray.copy(alpha = 0.5f)
+        isSelected -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.surface
+    }
+    
+    val textColor = when {
+        !slot.isAvailable -> Color.Gray
+        isSelected -> Color.White
+        else -> Color.Black
+    }
+
+    Card(
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+            .clickable(enabled = slot.isAvailable, onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        border = if (!isSelected && slot.isAvailable) BorderStroke(1.dp, Color.LightGray) else null
+    ) {
+        Text(
+            text = slot.startTime,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            color = textColor,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun FlowRow(
+    modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    content: @Composable () -> Unit
+) {
+    androidx.compose.foundation.layout.FlowRow(
+        modifier = modifier,
+        horizontalArrangement = horizontalArrangement,
+        content = { content() }
+    )
 }
