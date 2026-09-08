@@ -13,8 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Booking
 import com.example.customerservicebooking.utils.enums.BookingStatus
 
@@ -34,10 +36,13 @@ fun MyBookingScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Bookings") },
+                title = { Text(stringResource(R.string.my_bookings)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_content_description)
+                        )
                     }
                 }
             )
@@ -55,7 +60,7 @@ fun MyBookingScreen(
                 is MyBookingUiState.Success -> {
                     if (state.bookings.isEmpty()) {
                         Text(
-                            text = "You have no bookings yet.",
+                            text = stringResource(R.string.no_bookings_yet),
                             modifier = Modifier.align(Alignment.Center),
                             style = MaterialTheme.typography.bodyLarge
                         )
@@ -76,9 +81,12 @@ fun MyBookingScreen(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                        Text(
+                            text = stringResource(R.string.error_message, state.message),
+                            color = MaterialTheme.colorScheme.error
+                        )
                         Button(onClick = { viewModel.loadBookings() }) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -103,7 +111,7 @@ fun BookingItem(booking: Booking, onClick: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Booking #${booking.bookingNumber}",
+                    text = stringResource(R.string.booking_number_format, booking.bookingNumber),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -119,7 +127,7 @@ fun BookingItem(booking: Booking, onClick: () -> Unit) {
             )
             
             Text(
-                text = "Provider: ${booking.provider}",
+                text = stringResource(R.string.provider_format, booking.provider),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray
             )
@@ -128,7 +136,11 @@ fun BookingItem(booking: Booking, onClick: () -> Unit) {
             
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "${booking.scheduledDate} at ${booking.scheduledTime}",
+                    text = stringResource(
+                        R.string.date_at_time_format,
+                        booking.scheduledDate,
+                        booking.scheduledTime
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold
                 )

@@ -15,8 +15,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Service
 import com.example.customerservicebooking.model.TimeSlot
 
@@ -40,10 +42,13 @@ fun ServiceDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Service Details") },
+                title = { Text(stringResource(R.string.service_details)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_content_description)
+                        )
                     }
                 }
             )
@@ -64,7 +69,7 @@ fun ServiceDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = selectedDate != null && selectedSlot != null
                     ) {
-                        Text("Continue to Booking")
+                        Text(stringResource(R.string.continue_to_booking))
                     }
                 }
             }
@@ -132,9 +137,15 @@ fun ServiceDetailContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            InfoChip(label = "Provider", value = service.provider)
-            InfoChip(label = "Rating", value = "${service.rating} ⭐")
-            InfoChip(label = "Duration", value = "${service.durationMinutes} min")
+            InfoChip(label = stringResource(R.string.label_provider), value = service.provider)
+            InfoChip(
+                label = stringResource(R.string.label_rating),
+                value = stringResource(R.string.rating_format, service.rating)
+            )
+            InfoChip(
+                label = stringResource(R.string.label_duration),
+                value = stringResource(R.string.duration_mins_format, service.durationMinutes)
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -151,7 +162,7 @@ fun ServiceDetailContent(
 
         // Description
         Text(
-            text = "Description",
+            text = stringResource(R.string.label_description),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -164,7 +175,7 @@ fun ServiceDetailContent(
 
         // Date Selection
         Text(
-            text = "Select Date",
+            text = stringResource(R.string.label_select_date),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -189,7 +200,7 @@ fun ServiceDetailContent(
 
         // Availability Section
         Text(
-            text = "Available Slots",
+            text = stringResource(R.string.label_available_slots),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -200,7 +211,7 @@ fun ServiceDetailContent(
             }
             is AvailabilityUiState.Success -> {
                 if (availabilityState.slots.isEmpty()) {
-                    Text("No slots available for this date.")
+                    Text(stringResource(R.string.no_slots_available))
                 } else {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),

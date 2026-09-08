@@ -40,9 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Service
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,10 +60,13 @@ fun ServiceListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Available Services") },
+                title = { Text(stringResource(R.string.available_services)) },
                 actions = {
                     IconButton(onClick = onMyBookingsClick) {
-                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = "My Bookings")
+                        Icon(
+                            Icons.AutoMirrored.Filled.List,
+                            contentDescription = stringResource(R.string.my_bookings)
+                        )
                     }
                 }
             )
@@ -82,7 +87,7 @@ fun ServiceListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                placeholder = { Text("Search services...") },
+                placeholder = { Text(stringResource(R.string.search_services_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true
             )
@@ -96,7 +101,7 @@ fun ServiceListScreen(
                 is ServiceUiState.Success -> {
                     if (state.services.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text("No services found")
+                            Text(stringResource(R.string.no_services_found))
                         }
                     } else {
                         LazyColumn(
@@ -113,9 +118,12 @@ fun ServiceListScreen(
                 is ServiceUiState.Error -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "Error: ${state.message}", color = MaterialTheme.colorScheme.error)
+                            Text(
+                                text = stringResource(R.string.error_message, state.message),
+                                color = MaterialTheme.colorScheme.error
+                            )
                             Button(onClick = { viewModel.loadServices(searchQuery) }) {
-                                Text("Retry")
+                                Text(stringResource(R.string.retry))
                             }
                         }
                     }
@@ -188,7 +196,7 @@ fun ServiceItem(service: Service, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "${service.durationMinutes} mins",
+                    text = stringResource(R.string.duration_mins_format, service.durationMinutes),
                     style = MaterialTheme.typography.bodySmall
                 )
             }

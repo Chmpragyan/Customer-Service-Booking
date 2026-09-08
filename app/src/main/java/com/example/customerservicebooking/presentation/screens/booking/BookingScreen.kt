@@ -40,9 +40,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Booking
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,10 +71,13 @@ fun BookingScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Complete Booking") },
+                title = { Text(stringResource(R.string.complete_booking)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_content_description)
+                        )
                     }
                 }
             )
@@ -103,19 +108,27 @@ fun BookingScreen(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
-                                Text("Booking Summary", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    stringResource(R.string.booking_summary),
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
-                                SummaryRow("Service", serviceName)
-                                SummaryRow("Date", date)
-                                SummaryRow("Time", startTime)
-                                SummaryRow("Total Price", price)
+                                SummaryRow(stringResource(R.string.label_service), serviceName)
+                                SummaryRow(stringResource(R.string.label_date), date)
+                                SummaryRow(stringResource(R.string.label_time), startTime)
+                                SummaryRow(stringResource(R.string.label_total_price), price)
                             }
                         }
 
                         HorizontalDivider()
 
                         // Form Section
-                        Text("Customer Information", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            stringResource(R.string.customer_information),
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
                         
                         OutlinedTextField(
                             value = customerName,
@@ -123,10 +136,10 @@ fun BookingScreen(
                                 customerName = it
                                 nameError = false
                             },
-                            label = { Text("Full Name *") },
+                            label = { Text(stringResource(R.string.label_full_name)) },
                             modifier = Modifier.fillMaxWidth(),
                             isError = nameError,
-                            supportingText = { if (nameError) Text("Required") }
+                            supportingText = { if (nameError) Text(stringResource(R.string.error_required)) }
                         )
 
                         OutlinedTextField(
@@ -135,17 +148,17 @@ fun BookingScreen(
                                 customerContact = it
                                 contactError = false
                             },
-                            label = { Text("Contact Number *") },
+                            label = { Text(stringResource(R.string.label_contact_number)) },
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             isError = contactError,
-                            supportingText = { if (contactError) Text("Required") }
+                            supportingText = { if (contactError) Text(stringResource(R.string.error_required)) }
                         )
 
                         OutlinedTextField(
                             value = customerAddress,
                             onValueChange = { customerAddress = it },
-                            label = { Text("Address (Optional)") },
+                            label = { Text(stringResource(R.string.label_address_optional)) },
                             modifier = Modifier.fillMaxWidth(),
                             minLines = 3
                         )
@@ -182,7 +195,7 @@ fun BookingScreen(
                             if (state is BookingUiState.Submitting) {
                                 CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                             } else {
-                                Text("Confirm Booking")
+                                Text(stringResource(R.string.confirm_booking))
                             }
                         }
                     }
@@ -217,12 +230,19 @@ fun BookingSuccessContent(booking: Booking, onFinish: () -> Unit) {
             modifier = Modifier.size(100.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Booking Confirmed!", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text(
+            stringResource(R.string.booking_confirmed),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier = Modifier.height(8.dp))
-        Text("Booking ID: ${booking.bookingNumber}", style = MaterialTheme.typography.bodyLarge)
+        Text(
+            stringResource(R.string.booking_id_display, booking.bookingNumber),
+            style = MaterialTheme.typography.bodyLarge
+        )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onFinish, modifier = Modifier.fillMaxWidth()) {
-            Text("Back to Home")
+            Text(stringResource(R.string.back_to_home))
         }
     }
 }

@@ -13,8 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Booking
 import com.example.customerservicebooking.presentation.screens.myBookings.StatusBadge
 
@@ -34,10 +36,13 @@ fun BookingDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Booking Details") },
+                title = { Text(stringResource(R.string.booking_details_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_content_description)
+                        )
                     }
                 }
             )
@@ -60,9 +65,12 @@ fun BookingDetailScreen(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                        Text(
+                            text = stringResource(R.string.error_message, state.message),
+                            color = MaterialTheme.colorScheme.error
+                        )
                         Button(onClick = { bookingId?.let { viewModel.loadBooking(it) } }) {
-                            Text("Retry")
+                            Text(stringResource(R.string.retry))
                         }
                     }
                 }
@@ -91,7 +99,7 @@ fun BookingDetailContent(booking: Booking) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Booking Number", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.label_booking_number), style = MaterialTheme.typography.labelMedium)
                     Text(booking.bookingNumber, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
                 StatusBadge(status = booking.status)
@@ -99,27 +107,27 @@ fun BookingDetailContent(booking: Booking) {
         }
 
         // Service Info
-        Text("Service Information", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        DetailRow("Service", booking.serviceName)
-        DetailRow("Provider", booking.provider)
-        DetailRow("Scheduled Date", booking.scheduledDate)
-        DetailRow("Scheduled Time", booking.scheduledTime)
-        DetailRow("Total Price", "${booking.currency} ${booking.totalPrice}")
+        Text(stringResource(R.string.service_information), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        DetailRow(stringResource(R.string.label_service), booking.serviceName)
+        DetailRow(stringResource(R.string.label_provider), booking.provider)
+        DetailRow(stringResource(R.string.label_scheduled_date), booking.scheduledDate)
+        DetailRow(stringResource(R.string.label_scheduled_time), booking.scheduledTime)
+        DetailRow(stringResource(R.string.label_total_price), "${booking.currency} ${booking.totalPrice}")
 
         HorizontalDivider()
 
         // Customer Info
-        Text("Customer Information", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-        DetailRow("Name", booking.customerName)
-        DetailRow("Contact", booking.customerContact)
+        Text(stringResource(R.string.customer_information), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+        DetailRow(stringResource(R.string.label_name), booking.customerName)
+        DetailRow(stringResource(R.string.label_contact), booking.customerContact)
         booking.customerAddress?.let {
-            DetailRow("Address", it)
+            DetailRow(stringResource(R.string.label_address), it)
         }
 
         HorizontalDivider()
 
         // Meta Info
-        Text("Booking Created On", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+        Text(stringResource(R.string.label_booking_created_on), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
         Text(booking.createdAt, style = MaterialTheme.typography.bodySmall)
     }
 }
