@@ -10,7 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.customerservicebooking.data.mock.MockApiService
 import com.example.customerservicebooking.data.repository.ServiceRepository
-import com.example.customerservicebooking.presentation.screens.serviceScreen.ServiceListScreen
+import com.example.customerservicebooking.presentation.components.AppNavigation
 import com.example.customerservicebooking.presentation.screens.serviceScreen.ServiceViewModel
 import com.example.customerservicebooking.ui.theme.CustomerServiceBookingTheme
 
@@ -30,12 +30,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    ServiceListScreen(
-                        viewModel = viewModel,
-                        onServiceClick = { _ ->
-                            // Handle click (e.g., navigate to detail)
-                        }
-                    )
+                    AppNavigation(viewModel)
                 }
             }
         }
