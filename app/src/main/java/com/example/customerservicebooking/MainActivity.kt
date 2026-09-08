@@ -12,6 +12,7 @@ import com.example.customerservicebooking.data.mock.MockApiService
 import com.example.customerservicebooking.data.repository.ServiceRepository
 import com.example.customerservicebooking.presentation.components.AppNavigation
 import com.example.customerservicebooking.presentation.screens.booking.BookingViewModel
+import com.example.customerservicebooking.presentation.screens.bookingDetail.BookingDetailViewModel
 import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingViewModel
 import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
 import com.example.customerservicebooking.presentation.screens.services.ServiceViewModel
@@ -21,13 +22,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Manual DI for simplicity in this mock setup
         val apiService = MockApiService()
         val repository = ServiceRepository(apiService)
         val serviceViewModel = ServiceViewModel(repository)
         val serviceDetailViewModel = ServiceDetailViewModel(repository)
         val bookingViewModel = BookingViewModel(repository)
         val myBookingViewModel = MyBookingViewModel(repository)
+        val bookingDetailViewModel = BookingDetailViewModel(repository)
 
         enableEdgeToEdge()
         setContent {
@@ -40,7 +41,8 @@ class MainActivity : ComponentActivity() {
                         serviceViewModel = serviceViewModel,
                         serviceDetailViewModel = serviceDetailViewModel,
                         bookingViewModel = bookingViewModel,
-                        myBookingViewModel = myBookingViewModel
+                        myBookingViewModel = myBookingViewModel,
+                        bookingDetailViewModel = bookingDetailViewModel
                     )
                 }
             }

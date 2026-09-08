@@ -8,6 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.customerservicebooking.presentation.screens.booking.BookingScreen
 import com.example.customerservicebooking.presentation.screens.booking.BookingViewModel
+import com.example.customerservicebooking.presentation.screens.bookingDetail.BookingDetailScreen
+import com.example.customerservicebooking.presentation.screens.bookingDetail.BookingDetailViewModel
 import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingScreen
 import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingViewModel
 import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailScreen
@@ -20,7 +22,8 @@ fun AppNavigation(
     serviceViewModel: ServiceViewModel,
     serviceDetailViewModel: ServiceDetailViewModel,
     bookingViewModel: BookingViewModel,
-    myBookingViewModel: MyBookingViewModel
+    myBookingViewModel: MyBookingViewModel,
+    bookingDetailViewModel: BookingDetailViewModel
 ) {
     val navController = rememberNavController()
 
@@ -87,8 +90,19 @@ fun AppNavigation(
                 viewModel = myBookingViewModel,
                 onBackClick = { navController.popBackStack() },
                 onBookingClick = { booking ->
-                    // Navigate to details if needed
+                    navController.navigate("bookingDetail/${booking.bookingId}")
                 }
+            )
+        }
+        composable(
+            route = "bookingDetail/{bookingId}",
+            arguments = listOf(navArgument("bookingId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val bookingId = backStackEntry.arguments?.getString("bookingId")
+            BookingDetailScreen(
+                bookingId = bookingId,
+                viewModel = bookingDetailViewModel,
+                onBackClick = { navController.popBackStack() }
             )
         }
     }
