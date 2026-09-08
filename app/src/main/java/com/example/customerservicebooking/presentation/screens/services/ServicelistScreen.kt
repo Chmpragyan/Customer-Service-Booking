@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -47,7 +49,8 @@ import com.example.customerservicebooking.model.Service
 @Composable
 fun ServiceListScreen(
     viewModel: ServiceViewModel,
-    onServiceClick: (Service) -> Unit
+    onServiceClick: (Service) -> Unit,
+    onMyBookingsClick: () -> Unit
 ) {
     val uiState by viewModel.servicesState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -55,7 +58,12 @@ fun ServiceListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Available Services") }
+                title = { Text("Available Services") },
+                actions = {
+                    IconButton(onClick = onMyBookingsClick) {
+                        Icon(Icons.AutoMirrored.Filled.List, contentDescription = "My Bookings")
+                    }
+                }
             )
         }
     ) { paddingValues ->
