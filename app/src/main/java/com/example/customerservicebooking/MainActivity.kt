@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import com.example.customerservicebooking.data.mock.MockApiService
 import com.example.customerservicebooking.data.repository.ServiceRepository
 import com.example.customerservicebooking.presentation.components.AppNavigation
+import com.example.customerservicebooking.presentation.screens.booking.BookingViewModel
 import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
 import com.example.customerservicebooking.presentation.screens.services.ServiceViewModel
 import com.example.customerservicebooking.ui.theme.CustomerServiceBookingTheme
@@ -24,6 +25,7 @@ class MainActivity : ComponentActivity() {
         val repository = ServiceRepository(apiService)
         val serviceViewModel = ServiceViewModel(repository)
         val serviceDetailViewModel = ServiceDetailViewModel(repository)
+        val bookingViewModel = BookingViewModel(repository)
 
         enableEdgeToEdge()
         setContent {
@@ -34,7 +36,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavigation(
                         serviceViewModel = serviceViewModel,
-                        serviceDetailViewModel = serviceDetailViewModel
+                        serviceDetailViewModel = serviceDetailViewModel,
+                        bookingViewModel = bookingViewModel
                     )
                 }
             }
