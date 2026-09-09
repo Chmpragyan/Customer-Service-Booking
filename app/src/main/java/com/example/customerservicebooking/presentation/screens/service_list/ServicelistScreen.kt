@@ -1,4 +1,4 @@
-package com.example.customerservicebooking.presentation.screens.services
+package com.example.customerservicebooking.presentation.screens.service_list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

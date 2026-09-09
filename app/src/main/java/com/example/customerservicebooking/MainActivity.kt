@@ -12,10 +12,10 @@ import com.example.customerservicebooking.data.mock.MockApiService
 import com.example.customerservicebooking.data.repository.ServiceRepository
 import com.example.customerservicebooking.presentation.components.AppNavigation
 import com.example.customerservicebooking.presentation.screens.booking.BookingViewModel
-import com.example.customerservicebooking.presentation.screens.bookingDetail.BookingDetailViewModel
-import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingViewModel
-import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
-import com.example.customerservicebooking.presentation.screens.services.ServiceViewModel
+import com.example.customerservicebooking.presentation.screens.booking_detail.BookingDetailViewModel
+import com.example.customerservicebooking.presentation.screens.my_booking.MyBookingViewModel
+import com.example.customerservicebooking.presentation.screens.service_detail.ServiceDetailViewModel
+import com.example.customerservicebooking.presentation.screens.service_list.ServiceViewModel
 import com.example.customerservicebooking.ui.theme.CustomerServiceBookingTheme
 
 class MainActivity : ComponentActivity() {

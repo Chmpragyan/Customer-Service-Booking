@@ -8,14 +8,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.customerservicebooking.presentation.screens.booking.BookingScreen
 import com.example.customerservicebooking.presentation.screens.booking.BookingViewModel
-import com.example.customerservicebooking.presentation.screens.bookingDetail.BookingDetailScreen
-import com.example.customerservicebooking.presentation.screens.bookingDetail.BookingDetailViewModel
-import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingScreen
-import com.example.customerservicebooking.presentation.screens.myBookings.MyBookingViewModel
-import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailScreen
-import com.example.customerservicebooking.presentation.screens.serviceDetail.ServiceDetailViewModel
-import com.example.customerservicebooking.presentation.screens.services.ServiceListScreen
-import com.example.customerservicebooking.presentation.screens.services.ServiceViewModel
+import com.example.customerservicebooking.presentation.screens.booking_detail.BookingDetailScreen
+import com.example.customerservicebooking.presentation.screens.booking_detail.BookingDetailViewModel
+import com.example.customerservicebooking.presentation.screens.my_booking.MyBookingScreen
+import com.example.customerservicebooking.presentation.screens.my_booking.MyBookingViewModel
+import com.example.customerservicebooking.presentation.screens.service_detail.ServiceDetailScreen
+import com.example.customerservicebooking.presentation.screens.service_detail.ServiceDetailViewModel
+import com.example.customerservicebooking.presentation.screens.service_list.ServiceListScreen
+import com.example.customerservicebooking.presentation.screens.service_list.ServiceViewModel
 
 @Composable
 fun AppNavigation(

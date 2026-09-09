@@ -1,4 +1,4 @@
-package com.example.customerservicebooking.presentation.screens.bookingDetail
+package com.example.customerservicebooking.presentation.screens.booking_detail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

@@ -1,4 +1,4 @@
-package com.example.customerservicebooking.presentation.screens.myBookings
+package com.example.customerservicebooking.presentation.screens.my_booking
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
