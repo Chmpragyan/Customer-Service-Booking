@@ -1,0 +1,260 @@
+package com.example.customerservicebooking.presentation.screens.service_list
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.customerservicebooking.R
+import com.example.customerservicebooking.model.Service
+import com.example.customerservicebooking.presentation.components.BookingToolbar
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ServiceListScreen(
+    viewModel: ServiceViewModel,
+    onServiceClick: (Service) -> Unit,
+    onMyBookingsClick: () -> Unit
+) {
+    val uiState by viewModel.servicesState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val focusManager = LocalFocusManager.current
+
+    Scaffold(
+        topBar = {
+            BookingToolbar(
+                title = stringResource(R.string.available_services),
+                actions = {
+                    IconButton(onClick = onMyBookingsClick) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.List,
+                            contentDescription = stringResource(R.string.my_bookings)
+                        )
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = {
+                    viewModel.onSearchQueryChange(it)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .onFocusChanged { },
+                placeholder = { Text(stringResource(R.string.search_services_placeholder)) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = {
+                            viewModel.onSearchQueryChange("")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.clear_search)
+                            )
+                        }
+                    }
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = {
+                    focusManager.clearFocus()
+                })
+            )
+
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = { viewModel.onRefresh() },
+                modifier = Modifier.fillMaxSize()
+            ) {
+                when (val state = uiState) {
+                    is ServiceUiState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    }
+
+                    is ServiceUiState.Success -> {
+                        if (state.services.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(stringResource(R.string.no_services_found))
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(state.services) { service ->
+                                    ServiceItem(
+                                        service = service,
+                                        onClick = {
+                                            focusManager.clearFocus()
+                                            onServiceClick(service)
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    is ServiceUiState.Error -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = stringResource(R.string.error_message, state.message),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                                Button(onClick = { viewModel.loadServices(searchQuery) }) {
+                                    Text(stringResource(R.string.retry))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ServiceItem(service: Service, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = service.name,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "${service.currency} ${service.price}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = service.category,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = service.description,
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 2
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color(0xFFFFB300),
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = service.rating.toString(),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = stringResource(R.string.duration_mins_format, service.durationMinutes),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun ServiceItemPreview() {
+    val mockService = Service(
+        "1", "AC Repair", "Maintenance", "CoolAir Solutions",
+        500.0, "NPR", 60, 4.5, "Professional AC maintenance and repair"
+    )
+    ServiceItem(service = mockService, onClick = {})
+}

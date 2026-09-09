@@ -5,16 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.customerservicebooking"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.example.customerservicebooking"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -43,6 +39,9 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
