@@ -21,7 +21,7 @@ Handles data operations from various sources.
 
 ## Core Technologies & Libraries
 
-- **UI Framework**: Jetpack Compose (Material 3)
+- **UI Framework**: Jetpack Compose
 - **Asynchronous Work**: Kotlin Coroutines & Flow for non-blocking data streams.
 - **Navigation**: Jetpack Compose Navigation for type-safe routing.
 - **State Management**: `StateFlow` and `MutableStateFlow` for predictable UI states.
@@ -37,21 +37,24 @@ com.example.customerservicebooking
 ├── model
 │   └── (Data entities / DTOs)
 ├── presentation
-│   ├── components (Shared UI & Navigation)
+│   ├── components (Shared UI)
+│   ├── navigation (Navigation routes & NavHost)
 │   ├── screens
 │   │   ├── service_list
 │   │   ├── service_detail
 │   │   ├── booking
-│   │   ├── my_bookings
+│   │   ├── my_booking
 │   │   └── booking_detail
 │   └── theme (Material 3 styling)
 └── utils
-    └── (Enums & API helper classes)
+    ├── Api response events
+    ├── enum
+    └── (Date utils & Enums)
 ```
 
 ---
 
-## 🔄 Data Flow
+## Data Flow
 
 1. User interacts with a **Screen** (View).
 2. The View calls a method on the **ViewModel**.
