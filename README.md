@@ -19,6 +19,12 @@ A modern Android application built with Jetpack Compose that allows users to dis
 *   Asynchrony: Coroutines
 *   Dependency Injection: Manual DI (Simulated)
 
+# Documentation
+
+*   [Setup Guide](docs/setup.md)
+*   [Architecture Overview](docs/architecture.md)
+*   [API Contract](docs/api-contract.md)
+
 # Testing Mock Scenarios
 
 The app uses a `MockApiService` to simulate various real-world scenarios to test various states.
