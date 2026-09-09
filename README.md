@@ -24,6 +24,7 @@ A modern Android application built with Jetpack Compose that allows users to dis
 *   [Setup Guide](docs/setup.md)
 *   [Architecture Overview](docs/architecture.md)
 *   [API Contract](docs/api-contract.md)
+*   [Architecture Decisions (ADR)](docs/decisions.md)
 
 # Testing Mock Scenarios
 
