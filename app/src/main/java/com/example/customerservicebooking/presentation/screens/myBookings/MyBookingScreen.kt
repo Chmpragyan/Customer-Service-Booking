@@ -3,8 +3,6 @@ package com.example.customerservicebooking.presentation.screens.myBookings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Booking
-import com.example.customerservicebooking.utils.enums.BookingStatus
+import com.example.customerservicebooking.presentation.components.BookingToolbar
+import com.example.customerservicebooking.presentation.components.StatusBadge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,16 +34,10 @@ fun MyBookingScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.my_bookings)) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.back_content_description)
-                        )
-                    }
-                }
+            BookingToolbar(
+                title = stringResource(R.string.my_bookings),
+                showBackArrow = true,
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->
@@ -146,29 +139,5 @@ fun BookingItem(booking: Booking, onClick: () -> Unit) {
                 )
             }
         }
-    }
-}
-
-@Composable
-fun StatusBadge(status: BookingStatus) {
-    val color = when (status) {
-        BookingStatus.PENDING -> Color(0xFFFFA000)
-        BookingStatus.CONFIRMED -> Color(0xFF4CAF50)
-        BookingStatus.CANCELLED -> Color(0xFFF44336)
-        BookingStatus.COMPLETED -> Color(0xFF2196F3)
-    }
-
-    Surface(
-        color = color.copy(alpha = 0.1f),
-        shape = MaterialTheme.shapes.small,
-        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.5f))
-    ) {
-        Text(
-            text = status.name,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
-            fontWeight = FontWeight.Bold
-        )
     }
 }

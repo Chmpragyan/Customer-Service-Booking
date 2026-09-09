@@ -33,14 +33,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -53,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Service
+import com.example.customerservicebooking.presentation.components.BookingToolbar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,13 +61,12 @@ fun ServiceListScreen(
     val uiState by viewModel.servicesState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
-    var isSearchFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.available_services)) },
+            BookingToolbar(
+                title = stringResource(R.string.available_services),
                 actions = {
                     IconButton(onClick = onMyBookingsClick) {
                         Icon(

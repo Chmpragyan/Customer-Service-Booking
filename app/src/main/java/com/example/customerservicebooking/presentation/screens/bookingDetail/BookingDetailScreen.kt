@@ -3,8 +3,6 @@ package com.example.customerservicebooking.presentation.screens.bookingDetail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +16,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.customerservicebooking.R
 import com.example.customerservicebooking.model.Booking
-import com.example.customerservicebooking.presentation.screens.myBookings.StatusBadge
+import com.example.customerservicebooking.presentation.components.BookingToolbar
+import com.example.customerservicebooking.presentation.components.DetailRow
+import com.example.customerservicebooking.presentation.components.StatusBadge
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,16 +35,10 @@ fun BookingDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.booking_details_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.back_content_description)
-                        )
-                    }
-                }
+            BookingToolbar(
+                title = stringResource(R.string.booking_details_title),
+                showBackArrow = true,
+                onBackClick = onBackClick
             )
         }
     ) { paddingValues ->
@@ -129,13 +123,5 @@ fun BookingDetailContent(booking: Booking) {
         // Meta Info
         Text(stringResource(R.string.label_booking_created_on), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
         Text(booking.createdAt, style = MaterialTheme.typography.bodySmall)
-    }
-}
-
-@Composable
-fun DetailRow(label: String, value: String) {
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Text(text = label, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
     }
 }
