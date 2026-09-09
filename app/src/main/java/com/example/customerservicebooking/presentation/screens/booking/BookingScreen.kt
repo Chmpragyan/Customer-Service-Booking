@@ -139,7 +139,8 @@ fun BookingScreen(
                                 imeAction = ImeAction.Next
                             ),
                             isError = nameError,
-                            supportingText = { if (nameError) Text(stringResource(R.string.error_required)) }
+                            supportingText = { if (nameError) Text(stringResource(R.string.error_required)) },
+                            enabled = state !is BookingUiState.Submitting
                         )
 
                         OutlinedTextField(
@@ -156,7 +157,8 @@ fun BookingScreen(
                                 imeAction = ImeAction.Next
                             ),
                             isError = contactError,
-                            supportingText = { if (contactError) Text(stringResource(R.string.error_required)) }
+                            supportingText = { if (contactError) Text(stringResource(R.string.error_required)) },
+                            enabled = state !is BookingUiState.Submitting
                         )
 
                         OutlinedTextField(
@@ -168,7 +170,8 @@ fun BookingScreen(
                                 keyboardType = KeyboardType.Text,
                                 imeAction = ImeAction.Done
                             ),
-                            minLines = 3
+                            minLines = 3,
+                            enabled = state !is BookingUiState.Submitting
                         )
 
                         if (state is BookingUiState.Error) {

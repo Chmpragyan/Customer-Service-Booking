@@ -45,8 +45,7 @@ import com.example.customerservicebooking.model.Service
 import com.example.customerservicebooking.model.TimeSlot
 import com.example.customerservicebooking.presentation.components.BookingToolbar
 import com.example.customerservicebooking.presentation.components.InfoChip
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.customerservicebooking.utils.DateUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +117,10 @@ fun ServiceDetailScreen(
             }
             is ServiceDetailUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = stringResource(R.string.error_message, state.message),
+                        color = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
@@ -262,13 +264,7 @@ fun ServiceDetailContent(
 
 @Composable
 fun DateItem(date: String, isSelected: Boolean, onClick: () -> Unit) {
-    // "yyyy-MM-dd"
-    val displayDate = try {
-        val dateObj = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(date)
-        SimpleDateFormat("MMM dd\nEEE", Locale.getDefault()).format(dateObj!!)
-    } catch (e: Exception) {
-        date
-    }
+    val displayDate = DateUtils.formatToDisplay(date)
 
     Card(
         modifier = Modifier
